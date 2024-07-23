@@ -4,9 +4,8 @@ namespace API.Domain.DTOs;
 
 public class LoginDTO
 {
-    [Required(ErrorMessage = "The email is required.")]
-    [EmailAddress(ErrorMessage = "Invalid email.")]
-    public string Email { get; set; } = string.Empty;
+    [Required(ErrorMessage = "THe username is required.")]
+    public string Username { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "The password is required.")]
     [DataType(DataType.Password)]

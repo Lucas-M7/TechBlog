@@ -1,5 +1,6 @@
 using API.Domain.DTOs;
 using API.Domain.Models.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,7 @@ public class UsersController(UserManager<UserModel> userManager,
             return BadRequest(ModelState);
 
         var user = new UserModel
-        { UserName = registerDTO.Email, Email = registerDTO.Email, Age = registerDTO.Age };
+        { UserName = registerDTO.Username, Email = registerDTO.Email, Age = registerDTO.Age };
 
         var result = await _userManager.CreateAsync(user, registerDTO.Password);
 
@@ -38,19 +39,19 @@ public class UsersController(UserManager<UserModel> userManager,
             return BadRequest();
 
         var result = await _signInManager.PasswordSignInAsync(
-            loginDTO.Email, loginDTO.Password, loginDTO.RememberMe, lockoutOnFailure: false);
+            loginDTO.Username, loginDTO.Password, loginDTO.RememberMe, lockoutOnFailure: false);
 
         if (!result.Succeeded)
-            return Unauthorized("Invalid login attempt.");        
+            return Unauthorized("Invalid login attempt.");
 
-        return Ok("Login sucessfully.");    
+        return Ok("Login sucessfully.");
     }
 
+    [Authorize]
     [HttpPost("users/logout")]
     public async Task<IActionResult> Logout([FromBody] object empty)
     {
         await _signInManager.SignOutAsync();
         return Ok("Logout sucessfully.");
     }
-
 };

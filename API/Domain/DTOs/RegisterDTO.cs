@@ -9,6 +9,10 @@ public class RegisterDTO
     public string Email { get; set; } = string.Empty;
 
     [Required]
+    [MinLength(3, ErrorMessage = "The username must have at least 3 characters long.")]
+    public string Username { get; set; } = string.Empty;
+
+    [Required]
     [DataType(DataType.Password), MinLength(7, ErrorMessage = "The password must have at least 7 characters long.")]
     public string Password { get; set; } = string.Empty;
 

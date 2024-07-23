@@ -1,9 +1,13 @@
+using API.Domain.Interfaces;
 using API.Domain.Models.User;
 using API.Infrasctuture.Data;
+using API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IPostService, PostService>();
 
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
