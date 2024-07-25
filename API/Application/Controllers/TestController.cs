@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Application.Controllers.TestC;
+namespace API.Application.Controllers;
 
 
 [ApiController]

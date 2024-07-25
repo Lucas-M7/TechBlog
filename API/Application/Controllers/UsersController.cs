@@ -1,19 +1,22 @@
+using System.Security.Claims;
 using API.Domain.DTOs;
 using API.Domain.Models.User;
+using API.Infrasctuture.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Application.Controllers.UsersC;
+namespace API.Application.Controllers;
 
 [ApiController]
 [Route("api/")]
 public class UsersController(UserManager<UserModel> userManager,
-    SignInManager<UserModel> signInManager)
+    SignInManager<UserModel> signInManager, AppDbContext context)
     : ControllerBase
 {
     private readonly UserManager<UserModel> _userManager = userManager;
     private readonly SignInManager<UserModel> _signInManager = signInManager;
+    private readonly AppDbContext _context = context;
 
     [HttpPost("users")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
@@ -53,5 +56,28 @@ public class UsersController(UserManager<UserModel> userManager,
     {
         await _signInManager.SignOutAsync();
         return Ok("Logout sucessfully.");
+    }
+
+    [Authorize]
+    [HttpGet("users/posts")]
+    public IActionResult ListUserEspecifPost([FromQuery] int? page)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var query = _context.Posts.Where(p => p.UserId == userId);
+
+        int postsForPage = 20;
+
+        if (page != null && page > 0)
+            query = query.Skip(((int)page - 1) * postsForPage).Take(postsForPage);
+
+        var result = query.Select(post => new
+        {
+            post.PostId,
+            post.Title,
+            post.Content,
+            post.Username
+        }).ToList();
+
+        return Ok(result);
     }
 };

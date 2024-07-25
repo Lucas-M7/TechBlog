@@ -13,7 +13,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
+        
+        // Relation: posts <=> users
         builder.Entity<PostModel>()
             .HasOne(m => m.User)
             .WithMany().HasForeignKey(m => m.UserId);

@@ -7,11 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region ContainerDependeces
 builder.Services.AddScoped<IPostService, PostService>();
+#endregion
 
+#region DbConnection
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connection));   
+    options.UseSqlServer(connection));  
+#endregion 
 
 builder.Services.AddAuthorization(); 
 
@@ -20,8 +24,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+#region  IdentityContainer
 builder.Services.AddIdentity<UserModel, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
+#endregion
 
 var app = builder.Build();
 

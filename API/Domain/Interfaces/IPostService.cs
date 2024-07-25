@@ -1,4 +1,3 @@
-using API.Domain.DTOs;
 using API.Domain.Models.Post;
 
 namespace API.Domain.Interfaces;
