@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region ContainerDependeces
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IUserService, UserService>();
 #endregion
 
 #region DbConnection

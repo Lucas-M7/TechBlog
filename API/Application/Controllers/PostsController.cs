@@ -23,7 +23,7 @@ public class PostsController(IPostService postService,
     private readonly AppDbContext _context = context;
 
     [Authorize]
-    [HttpPost("posts")]
+    [HttpPost("posts/")]
     public async Task<IActionResult> CreatePosts([FromBody] PostDTO postDTO)
     {
         // Find user loged by id
@@ -49,21 +49,22 @@ public class PostsController(IPostService postService,
             Author = user.UserName
         };
 
-        _postService.CreatePost(post);
+        await _postService.CreatePost(post);
         return Created($"Post created sucessfuly: ", result);
     }
 
     [HttpGet("posts")]
     public IActionResult ListPosts([FromQuery] int? page)
     {
-        var query = _context.Posts.AsQueryable(); 
+        var query = _context.Posts.AsQueryable();
 
-        int postsForPage = 20;
+        int postsForPage = 10;
 
+        // Pagination
         if (page != null && page > 0)
             query = query.Skip(((int)page - 1) * postsForPage).Take(postsForPage);
 
-        
+        // Filtring datas
         var result = query.Select(post => new
         {
             post.PostId,
@@ -76,7 +77,7 @@ public class PostsController(IPostService postService,
     }
 
     [Authorize]
-    [HttpDelete("posts")]
+    [HttpDelete("posts/{id}")]
     public async Task<IActionResult> DeletePosts(int id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -88,9 +89,30 @@ public class PostsController(IPostService postService,
         if (post.UserId != userId)
             return Forbid("You are not allowed to delete this post.");
 
-        _context.Posts.Remove(post);
-        await _context.SaveChangesAsync();
+        await _postService.DeletePost(post);
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPut("posts")]
+    public async Task<IActionResult> ModifyPosts([FromQuery] int id, PostDTO postDTO)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var post = await _context.Posts.FindAsync(id);
+
+        if (post == null)
+            return NotFound("Post not found.");
+
+        if (post.UserId != userId)
+            return Forbid("You are not allowed to modify this post.");
+
+        // Changing the informations: title and content
+        post.Title = postDTO.Title;
+        post.Content = postDTO.Content;
+
+        await _postService.UpdatePost(post);
+
+        return Ok("Post successfully modified.");
     }
 }
