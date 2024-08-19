@@ -99,4 +99,28 @@ public class UsersController(UserManager<UserModel> userManager,
 
         return Ok(result);
     }
+
+    [Authorize]
+    [HttpDelete("users")]
+    public async Task<IActionResult> DeleteUser([FromQuery] DeleteUserDTO deleteUserDTO)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+            return NotFound("User not found.");
+
+        var passwordCheck = await _userManager.CheckPasswordAsync(user, deleteUserDTO.CurrentPassword);
+        if (!passwordCheck)
+            return BadRequest("Incorret password.");
+
+        var result = await _userManager.DeleteAsync(user);
+        await _signInManager.SignOutAsync();
+
+
+        if (!result.Succeeded)
+            return BadRequest("Failed to delete your account.");
+
+        return Ok("Account deleted sucessfully!");
+    }
 };

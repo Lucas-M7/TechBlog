@@ -2,7 +2,6 @@ using API.Domain.DTOs;
 using API.Domain.Interfaces;
 using API.Domain.Models.User;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace API.Services;
 
@@ -18,6 +17,7 @@ public class UserService(UserManager<UserModel> userManager,
         var user = new UserModel
         { UserName = registerDTO.Username, Email = registerDTO.Email, Age = registerDTO.Age };
 
+        // Hashing password
         var result = await _userManager.CreateAsync(user, registerDTO.Password);
 
         if (!result.Succeeded)
