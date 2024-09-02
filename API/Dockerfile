@@ -3,7 +3,6 @@ WORKDIR /API
 
 COPY . ./
 
-RUN dotnet restore
 RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
