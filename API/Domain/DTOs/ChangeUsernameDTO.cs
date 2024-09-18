@@ -15,7 +15,7 @@ public class ChangeUsernameDTO
     public string NewUsername { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the current pasword.
+    /// Gets or sets the current password.
     /// </summary>
     [Required(ErrorMessage = "Current password is required.")]
     [DataType(DataType.Password)]
