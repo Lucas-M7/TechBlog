@@ -5,16 +5,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Infrasctuture.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext(options)
+/// <summary>
+/// Application database context class.
+/// </summary>
+public class AppDbContext : IdentityDbContext<UserModel>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppDbContext"/> class.
+    /// </summary>
+    /// <param name="options">The options to be used by a <see cref="DbContext"/>.</param>
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base (options) { }
+    
+    /// <summary>
+    /// Gets or sets the Users table.
+    /// </summary>
     public new DbSet<UserModel> Users { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Posts table.
+    /// </summary>
     public DbSet<PostModel> Posts { get; set; }
 
+    /// <summary>
+    /// Configure the model relationships and other conventions.
+    /// </summary>
+    /// <param name="builder">The model builder.</param>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
         
-        // Relation: posts <=> users
+        // Configure relationship between PostModel and UserModel
         builder.Entity<PostModel>()
             .HasOne(m => m.User)
             .WithMany().HasForeignKey(m => m.UserId);
