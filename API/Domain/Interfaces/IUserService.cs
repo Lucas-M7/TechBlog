@@ -10,14 +10,14 @@ public interface IUserService
     /// <summary>
     /// Register a new user.
     /// </summary>
-    /// <param name="registerDTO">The registe to create.</param>
+    /// <param name="registerDTO">The registration data to create.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task Register(RegisterDTO registerDTO);
 
     /// <summary>
     /// Login a the user.
     /// </summary>
-    /// <param name="loginDTO">The login of user.</param>
+    /// <param name="loginDTO">The login data of the user.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task Login(LoginDTO loginDTO);
 }

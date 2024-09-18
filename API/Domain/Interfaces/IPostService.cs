@@ -25,7 +25,7 @@ public interface IPostService
     /// Deletes an existing post.
     /// </summary>
     /// <param name="post">The post to delete.</param>
-    /// <returns>A task that represent the asynchronous operation.</returns>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     Task DeletePost(PostModel post);
 
     /// <summary>
