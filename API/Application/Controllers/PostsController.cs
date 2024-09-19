@@ -13,20 +13,34 @@ namespace API.Application.Controllers;
 
 [ApiController]
 [Route("api/")]
-public class PostsController(IPostService postService,
-    UserManager<UserModel> userManager, AppDbContext context)
-    : ControllerBase
+public class PostsController : ControllerBase
 {
-    // Dependece Injection
-    private readonly IPostService _postService = postService;
-    private readonly UserManager<UserModel> _userManager = userManager;
-    private readonly AppDbContext _context = context;
+    private readonly IPostService _postService;
+    private readonly UserManager<UserModel> _userManager;
+    private readonly AppDbContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PostsController"/> class.
+    /// </summary>
+    /// <param name="postService">The post service for handling post operations.</param>
+    /// <param name="userManager">The user manager for handling user operations.</param>
+    /// <param name="context">The database context for accessing the database.</param>
+    public PostsController(IPostService postService, UserManager<UserModel> userManager, AppDbContext context)
+    {
+        _postService = postService;
+        _userManager = userManager;
+        _context = context;
+    }
+
+    /// <summary>
+    /// Creates a new post.
+    /// </summary>
+    /// <param name="postDTO">The post data transfer object.</param>
+    /// <returns>An action result indicating the outcome of the operation.</returns>
     [Authorize]
     [HttpPost("posts/")]
-    public async Task<IActionResult> CreatePosts([FromBody] PostDTO postDTO)
+    public async Task<IActionResult> CreatePost([FromBody] PostDTO postDTO)
     {
-        // Find user loged by id
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var user = await _userManager.FindByIdAsync(userId);
 
@@ -41,7 +55,8 @@ public class PostsController(IPostService postService,
             Username = user.UserName
         };
 
-        // Visualization model to hide some data
+        await _postService.CreatePost(post);
+
         var result = new PostView
         {
             Title = postDTO.Title,
@@ -49,22 +64,24 @@ public class PostsController(IPostService postService,
             Author = user.UserName
         };
 
-        await _postService.CreatePost(post);
-        return Created($"Post created sucessfuly: ", result);
+        return CreatedAtAction(nameof(CreatePost), new { id = post.PostId }, result);
     }
 
+    /// <summary>
+    /// Lists all posts with optional pagination.
+    /// </summary>
+    /// <param name="page">The page number for pagination.</param>
+    /// <returns>An action result with the list of posts.</returns>
     [HttpGet("posts")]
     public IActionResult ListPosts([FromQuery] int? page)
     {
+        const int postsPerPage = 10;
+
         var query = _context.Posts.AsQueryable();
 
-        int postsForPage = 10;
+        if (page.HasValue && page > 0)
+            query = query.Skip((page.Value - 1) * postsPerPage).Take(postsPerPage);
 
-        // Pagination
-        if (page != null && page > 0)
-            query = query.Skip(((int)page - 1) * postsForPage).Take(postsForPage);
-
-        // Filtring datas
         var result = query.Select(post => new
         {
             post.PostId,
@@ -76,6 +93,11 @@ public class PostsController(IPostService postService,
         return Ok(result);
     }
 
+    /// <summary>
+    /// Deletes a post by ID.
+    /// </summary>
+    /// <param name="id">The ID of the post to delete.</param>
+    /// <returns>An action result indicating the outcome of the operation.</returns>
     [Authorize]
     [HttpDelete("posts/{id}")]
     public async Task<IActionResult> DeletePosts(int id)
@@ -94,9 +116,15 @@ public class PostsController(IPostService postService,
         return NoContent();
     }
 
+    /// <summary>
+    /// Modifies an existing post.
+    /// </summary>
+    /// <param name="id">The ID of the post to modify.</param>
+    /// <param name="postDTO">The post data transfer object with updated information.</param>
+    /// <returns>An action result indicating the outcome of the operation.</returns>
     [Authorize]
     [HttpPut("posts")]
-    public async Task<IActionResult> ModifyPosts([FromQuery] int id, PostDTO postDTO)
+    public async Task<IActionResult> ModifyPost([FromQuery] int id, [FromBody] PostDTO postDTO)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var post = await _context.Posts.FindAsync(id);
@@ -106,8 +134,7 @@ public class PostsController(IPostService postService,
 
         if (post.UserId != userId)
             return Forbid("You are not allowed to modify this post.");
-
-        // Changing the informations: title and content
+            
         post.Title = postDTO.Title;
         post.Content = postDTO.Content;
 
