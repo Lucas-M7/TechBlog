@@ -11,17 +11,33 @@ namespace API.Application.Controllers;
 
 [ApiController]
 [Route("api/")]
-public class UsersController(UserManager<UserModel> userManager,
-    SignInManager<UserModel> signInManager, AppDbContext context,
-    IPostService postService, IUserService userService)
-    : ControllerBase
+public class UsersController : ControllerBase
 {
-    private readonly UserManager<UserModel> _userManager = userManager;
-    private readonly SignInManager<UserModel> _signInManager = signInManager;
-    private readonly AppDbContext _context = context;
-    private readonly IPostService _postService = postService;
-    private readonly IUserService _userService = userService;
+    private readonly UserManager<UserModel> _userManager;
+    private readonly SignInManager<UserModel> _signInManager;
+    private readonly AppDbContext _context;
+    private readonly IPostService _postService;
+    private readonly IUserService _userService;
 
+    public UsersController(
+            UserManager<UserModel> userManager,
+            SignInManager<UserModel> signInManager,
+            AppDbContext context,
+            IPostService postService,
+            IUserService userService)
+    {
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _context = context;
+        _postService = postService;
+        _userService = userService;
+    }
+
+    /// <summary>
+    /// Registers a new user.
+    /// </summary>
+    /// <param name="registerDTO">The registration details.</param>
+    /// <returns>Action result indicating the outcome of the registration process.</returns>
     [HttpPost("users")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
     {
@@ -33,25 +49,39 @@ public class UsersController(UserManager<UserModel> userManager,
         return Ok("User registered sucessfully.");
     }
 
+    /// <summary>
+    /// Logs in a user.
+    /// </summary>
+    /// <param name="loginDTO">The login details.</param>
+    /// <returns>Action result indicating the outcome of the login process.</returns>
     [HttpPost("users/login")]
     public async Task<IActionResult> Login([FromQuery] LoginDTO loginDTO)
     {
         if (!ModelState.IsValid)
-            return BadRequest();
+            return BadRequest(ModelState);
 
         await _userService.Login(loginDTO);
 
         return Ok("Login sucessfully.");
     }
 
+    /// <summary>
+    /// Logs out the current user.
+    /// </summary>
+    /// <returns>Action result indicating the outcome of the logout process.</returns>
     [Authorize]
     [HttpPost("users/logout")]
-    public async Task<IActionResult> Logout([FromBody] object empty)
+    public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
         return Ok("Logout sucessfully.");
     }
 
+    /// <summary>
+    /// Changes the username of the current user.
+    /// </summary>
+    /// <param name="changeUsernameDTO">The details required to change the username.</param>
+    /// <returns>Action result indicating the outcome of the username change process.</returns>
     [Authorize]
     [HttpPut("users")]
     public async Task<IActionResult> ChangeUsername([FromBody] ChangeUsernameDTO changeUsernameDTO)
@@ -66,7 +96,7 @@ public class UsersController(UserManager<UserModel> userManager,
         if (!passwordCheck)
             return BadRequest("Incorret password.");
 
-        // Changing old username for new username
+
         user.UserName = changeUsernameDTO.NewUsername;
         var result = await _userManager.UpdateAsync(user);
 
@@ -77,6 +107,11 @@ public class UsersController(UserManager<UserModel> userManager,
         return Ok("Username changed sucessfully.");
     }
 
+    /// <summary>
+    /// Lists posts of the current user with optional pagination.
+    /// </summary>
+    /// <param name="page">The page number for pagination (optional).</param>
+    /// <returns>A list of posts created by the current user.</returns>
     [Authorize]
     [HttpGet("users/posts")]
     public IActionResult ListUserEspecifPost([FromQuery] int? page)
@@ -84,10 +119,10 @@ public class UsersController(UserManager<UserModel> userManager,
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var query = _context.Posts.Where(p => p.UserId == userId);
 
-        int postsForPage = 10;
+        const int postsPerPage = 10;
 
-        if (page != null && page > 0)
-            query = query.Skip(((int)page - 1) * postsForPage).Take(postsForPage);
+        if (page.HasValue && page > 0)
+            query = query.Skip((page.Value - 1) * postsPerPage).Take(postsPerPage);
 
         var result = query.Select(post => new
         {
@@ -100,6 +135,11 @@ public class UsersController(UserManager<UserModel> userManager,
         return Ok(result);
     }
 
+    /// <summary>
+    /// Deletes the current user's account.
+    /// </summary>
+    /// <param name="deleteUserDTO">The details required to delete the account.</param>
+    /// <returns>Action result indicating the outcome of the account deletion process.</returns>
     [Authorize]
     [HttpDelete("users")]
     public async Task<IActionResult> DeleteUser([FromQuery] DeleteUserDTO deleteUserDTO)
