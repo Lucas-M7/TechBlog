@@ -4,6 +4,7 @@ using API.Infrasctuture.Data;
 using API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +24,15 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => {
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "TechBlog API",
+        Version = "v1"
+    });
+});
 
-#region  IdentityContainer
+#region  IdentityConfiguration
 builder.Services.AddIdentity<UserModel, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 #endregion
