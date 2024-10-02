@@ -16,10 +16,10 @@ public class AppDbContext : IdentityDbContext<UserModel>
     /// <param name="options">The options to be used by a <see cref="DbContext"/>.</param>
     public AppDbContext(DbContextOptions<AppDbContext> options) : base (options) { }
     
-    /// <summary>
-    /// Gets or sets the Users table.
-    /// </summary>
-    public new DbSet<UserModel> Users { get; set; }
+    // /// <summary>
+    // /// Gets or sets the Users table.
+    // /// </summary>b
+    // public new DbSet<UserModel> Users { get; set; }
 
     /// <summary>
     /// Gets or sets the Posts table.

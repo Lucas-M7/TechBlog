@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Security.Claims;
 using API.Domain.DTOs;
 using API.Domain.Interfaces;
@@ -39,7 +40,7 @@ public class PostsController : ControllerBase
     /// <returns>An action result indicating the outcome of the operation.</returns>
     [Authorize]
     [HttpPost("posts/")]
-    public async Task<IActionResult> CreatePost([FromBody] PostDTO postDTO)
+    public async Task<IActionResult> CreatePost([FromForm] PostDTO postDTO)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var user = await _userManager.FindByIdAsync(userId);
@@ -50,17 +51,17 @@ public class PostsController : ControllerBase
         var post = new PostModel
         {
             Title = postDTO.Title,
-            Content = postDTO.Content,
             UserId = userId,
             Username = user.UserName
         };
 
-        await _postService.CreatePost(post);
+        await _postService.CreatePost(post, postDTO.Image);
 
         var result = new PostView
         {
             Title = postDTO.Title,
             Content = postDTO.Content,
+            ImagePath = post.ImagePath,
             Author = user.UserName
         };
 
@@ -87,7 +88,8 @@ public class PostsController : ControllerBase
             post.PostId,
             post.Title,
             post.Content,
-            post.Username
+            post.Username,
+            ImageUrl = Url.Content($"~/{post.ImagePath}")
         });
 
         return Ok(result);

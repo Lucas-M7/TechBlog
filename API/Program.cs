@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 #region ContainerDependeces
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFileService, FileService>();
 #endregion
 
 #region DbConnection
@@ -34,7 +35,8 @@ builder.Services.AddSwaggerGen(c => {
 
 #region  IdentityConfiguration
 builder.Services.AddIdentity<UserModel, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>();
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 #endregion
 
 var app = builder.Build();
@@ -46,6 +48,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

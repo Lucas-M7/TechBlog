@@ -12,7 +12,7 @@ public interface IPostService
     /// </summary>
     /// <param name="post">The post to create.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task CreatePost(PostModel post);
+    Task CreatePost(PostModel post, IFormFile file);
 
     /// <summary>
     /// Updates an existing post.
