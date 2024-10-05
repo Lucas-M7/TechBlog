@@ -1,6 +1,6 @@
 using API.Domain.Interfaces;
 using API.Domain.Models.Post;
-using API.Infrasctuture.Data;
+using API.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
