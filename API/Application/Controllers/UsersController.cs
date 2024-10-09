@@ -2,7 +2,7 @@ using System.Security.Claims;
 using API.Domain.DTOs;
 using API.Domain.Interfaces;
 using API.Domain.Models.User;
-using API.Infrasctuture.Data;
+using API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

@@ -1,6 +1,6 @@
 using API.Domain.Interfaces;
 using API.Domain.Models.User;
-using API.Infrasctuture.Data;
+using API.Infrastructure.Data;
 using API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

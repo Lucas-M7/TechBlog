@@ -3,7 +3,7 @@ using API.Domain.Models.User;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace API.Infrasctuture.Data;
+namespace API.Infrastructure.Data;
 
 /// <summary>
 /// Application database context class.
