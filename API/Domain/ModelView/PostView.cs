@@ -19,6 +19,4 @@ public class PostView
     /// Gets or sets the author of the post.
     /// </summary>
     public string Author { get; set; } = string.Empty;
-
-    public string ImagePath { get; set; } = string.Empty;
 }

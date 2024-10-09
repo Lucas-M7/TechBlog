@@ -39,7 +39,7 @@ public class UsersController : ControllerBase
     /// <param name="registerDTO">The registration details.</param>
     /// <returns>Action result indicating the outcome of the registration process.</returns>
     [HttpPost("users")]
-    public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
+    public async Task<IActionResult> Register([FromForm] RegisterDTO registerDTO)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

@@ -18,9 +18,4 @@ public class PostDTO
     /// </summary>
     [Required, MinLength(10, ErrorMessage = "The content must have 10 characters long.")]
     public string Content { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Image of the post.
-    /// </summary>
-    public IFormFile Image { get; set; } = default!;
 }

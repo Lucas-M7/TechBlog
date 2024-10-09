@@ -10,24 +10,17 @@ namespace API.Services;
 /// And initializes a new instace of the <see cref="PostService"/> class.
 /// </summary>
 /// <param name="context">The application database context.</param>
-public class PostService(AppDbContext context, IFileService fileService) : IPostService
+public class PostService(AppDbContext context) : IPostService
 {
     private readonly AppDbContext _context = context;
-    private readonly IFileService _fileService = fileService;
 
     /// <summary>
     /// Creates a new post.
     /// </summary>
     /// <param name="post">The post to create.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task CreatePost(PostModel post, IFormFile file)
+    public async Task CreatePost(PostModel post)
     {
-        if (file != null)
-        {
-            var filePath = await _fileService.UploadFileAsync(file);
-            post.ImagePath = filePath;
-        }
-
         _context.Posts.Add(post);
         await _context.SaveChangesAsync();
     }

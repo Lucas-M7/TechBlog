@@ -28,8 +28,6 @@ public class PostModel
     [MinLength(10, ErrorMessage = "The content must have at least 10 characters.")]
     public string Content { get; set; } = string.Empty;
 
-    public string ImagePath { get; set; } = string.Empty;
-
     /// <summary>
     /// Gets or sets the user ID associated with the post.
     /// </summary>

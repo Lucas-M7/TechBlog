@@ -12,10 +12,11 @@ namespace API.Services;
 /// <param name="userManager">The user manager for handling user operations.</param>
 /// <param name="signInManager">The sign-in manager for handling user sign-ins.</param>
 public class UserService(UserManager<UserModel> userManager,
-    SignInManager<UserModel> signInManager) : IUserService
+    SignInManager<UserModel> signInManager, ILogger<UserService> logger) : IUserService
 {
     private readonly UserManager<UserModel> _userManager = userManager;
     private readonly SignInManager<UserModel> _signInManager = signInManager;
+    private readonly ILogger<UserService> _logger = logger;
 
     /// <summary>
     /// Registers a new user
@@ -45,6 +46,8 @@ public class UserService(UserManager<UserModel> userManager,
 
         if (!result.Succeeded)
             HandleLoginErrors();
+
+        _logger.LogInformation("User loged sucessfully.");
     }
 
     /// <summary>
@@ -80,6 +83,7 @@ public class UserService(UserManager<UserModel> userManager,
     /// <returns>A task representing the asynchronous sign-in operation.</returns>
     private async Task<SignInResult> SignInUser(LoginDTO loginDTO)
     {
+        _logger.LogInformation("Logging user.");
         return await _signInManager.PasswordSignInAsync(
             loginDTO.Username, loginDTO.Password, loginDTO.RememberMe, lockoutOnFailure: false);
     }

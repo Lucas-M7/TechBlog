@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Security.Claims;
 using API.Domain.DTOs;
 using API.Domain.Interfaces;
@@ -19,6 +18,7 @@ public class PostsController : ControllerBase
     private readonly IPostService _postService;
     private readonly UserManager<UserModel> _userManager;
     private readonly AppDbContext _context;
+    private readonly ILogger<PostsController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PostsController"/> class.
@@ -26,11 +26,12 @@ public class PostsController : ControllerBase
     /// <param name="postService">The post service for handling post operations.</param>
     /// <param name="userManager">The user manager for handling user operations.</param>
     /// <param name="context">The database context for accessing the database.</param>
-    public PostsController(IPostService postService, UserManager<UserModel> userManager, AppDbContext context)
+    public PostsController(IPostService postService, UserManager<UserModel> userManager, AppDbContext context, ILogger<PostsController> logger)
     {
         _postService = postService;
         _userManager = userManager;
         _context = context;
+        _logger = logger;
     }
 
     /// <summary>
@@ -51,20 +52,22 @@ public class PostsController : ControllerBase
         var post = new PostModel
         {
             Title = postDTO.Title,
+            Content = postDTO.Content,
             UserId = userId,
             Username = user.UserName
         };
 
-        await _postService.CreatePost(post, postDTO.Image);
+        _logger.LogInformation("Creating post.");
+        await _postService.CreatePost(post);
 
         var result = new PostView
         {
             Title = postDTO.Title,
             Content = postDTO.Content,
-            ImagePath = post.ImagePath,
             Author = user.UserName
         };
 
+        _logger.LogInformation("Post created sucessfully.");
         return CreatedAtAction(nameof(CreatePost), new { id = post.PostId }, result);
     }
 
@@ -88,10 +91,10 @@ public class PostsController : ControllerBase
             post.PostId,
             post.Title,
             post.Content,
-            post.Username,
-            ImageUrl = Url.Content($"~/{post.ImagePath}")
+            post.Username
         });
 
+        _logger.LogInformation("Posts listed sucessfully.");
         return Ok(result);
     }
 
@@ -115,6 +118,7 @@ public class PostsController : ControllerBase
 
         await _postService.DeletePost(post);
 
+        _logger.LogInformation("Post deleted sucessfully.");
         return NoContent();
     }
 
@@ -142,6 +146,7 @@ public class PostsController : ControllerBase
 
         await _postService.UpdatePost(post);
 
+        _logger.LogInformation("Post sucessfully modified.");
         return Ok("Post successfully modified.");
     }
 }

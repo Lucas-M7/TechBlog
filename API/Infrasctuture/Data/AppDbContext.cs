@@ -8,18 +8,18 @@ namespace API.Infrasctuture.Data;
 /// <summary>
 /// Application database context class.
 /// </summary>
-public class AppDbContext : IdentityDbContext<UserModel>
+public class AppDbContext : IdentityDbContext
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AppDbContext"/> class.
     /// </summary>
     /// <param name="options">The options to be used by a <see cref="DbContext"/>.</param>
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base (options) { }
-    
-    // /// <summary>
-    // /// Gets or sets the Users table.
-    // /// </summary>b
-    // public new DbSet<UserModel> Users { get; set; }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    /// <summary>
+    /// Gets or sets the Users table.
+    /// </summary>b
+    public new DbSet<UserModel> Users { get; set; }
 
     /// <summary>
     /// Gets or sets the Posts table.
@@ -33,7 +33,7 @@ public class AppDbContext : IdentityDbContext<UserModel>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         // Configure relationship between PostModel and UserModel
         builder.Entity<PostModel>()
             .HasOne(m => m.User)
