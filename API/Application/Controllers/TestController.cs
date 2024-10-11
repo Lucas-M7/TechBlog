@@ -1,3 +1,4 @@
+using API.Services.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +7,7 @@ namespace API.Application.Controllers;
 
 [ApiController]
 [Route("api")]
+[ServiceFilter(typeof(LogActionFilter))]
 public class TestController : ControllerBase
 {
     [Authorize]

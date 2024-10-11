@@ -3,6 +3,7 @@ using API.Domain.DTOs;
 using API.Domain.Interfaces;
 using API.Domain.Models.User;
 using API.Infrastructure.Data;
+using API.Services.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ namespace API.Application.Controllers;
 
 [ApiController]
 [Route("api/")]
+[ServiceFilter(typeof(LogActionFilter))]
 public class UsersController : ControllerBase
 {
     private readonly UserManager<UserModel> _userManager;

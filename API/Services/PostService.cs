@@ -1,7 +1,6 @@
 using API.Domain.Interfaces;
 using API.Domain.Models.Post;
 using API.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
@@ -10,9 +9,10 @@ namespace API.Services;
 /// And initializes a new instace of the <see cref="PostService"/> class.
 /// </summary>
 /// <param name="context">The application database context.</param>
-public class PostService(AppDbContext context) : IPostService
+public class PostService(AppDbContext context, IPostRepository postRepository) : IPostService
 {
     private readonly AppDbContext _context = context;
+    private readonly IPostRepository _postRepository = postRepository;
 
     /// <summary>
     /// Creates a new post.
@@ -64,5 +64,10 @@ public class PostService(AppDbContext context) : IPostService
         }
 
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<PostModel>> SearchPostsAsync(string searchTerm)
+    {
+        return await _postRepository.SearchPostsAsync(searchTerm);
     }
 }

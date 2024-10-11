@@ -1,7 +1,9 @@
 using API.Domain.Interfaces;
 using API.Domain.Models.User;
 using API.Infrastructure.Data;
+using API.Repository;
 using API.Services;
+using API.Services.Filters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -10,21 +12,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region ContainerDependeces
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<LogActionFilter>();
 #endregion
 
 #region DbConnection
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connection));  
-#endregion 
+    options.UseSqlServer(connection));
+#endregion
 
-builder.Services.AddAuthorization(); 
+builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(config =>
+{
+    config.Filters.Add<LogActionFilter>(); // Adding the filter globally
+});
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => {
+builder.Services.AddSwaggerGen(c =>
+{
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "TechBlog API",

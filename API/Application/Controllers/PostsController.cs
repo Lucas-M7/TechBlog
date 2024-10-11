@@ -5,6 +5,7 @@ using API.Domain.Models.Post;
 using API.Domain.Models.User;
 using API.Domain.ModelView;
 using API.Infrastructure.Data;
+using API.Services.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ namespace API.Application.Controllers;
 
 [ApiController]
 [Route("api/")]
+[ServiceFilter(typeof(LogActionFilter))]
 public class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
@@ -148,5 +150,29 @@ public class PostsController : ControllerBase
 
         _logger.LogInformation("Post sucessfully modified.");
         return Ok("Post successfully modified.");
+    }
+
+    /// <summary>
+    /// Funcionallity of search
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns>Returns the posts that has the term</returns>
+    [HttpGet("posts/search")]
+    public async Task<IActionResult> Search([FromQuery] string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return BadRequest("Search query cannot be empty.");
+
+        var queryPost = await _postService.SearchPostsAsync(query);
+
+        var result = queryPost.Select(post => new
+        {
+            post.PostId,
+            post.Title,
+            post.Content,
+            post.Username
+        });
+
+        return Ok(result);
     }
 }

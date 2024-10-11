@@ -35,4 +35,6 @@ public interface IPostService
     /// <param name="newUsername">The new username to update.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task UpdateUsernameInPosts(string userId, string newUsername);
+
+    Task<IEnumerable<PostModel>> SearchPostsAsync(string searchTerm);
 }
